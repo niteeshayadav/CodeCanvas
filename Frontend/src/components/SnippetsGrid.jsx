@@ -1,0 +1,216 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import snippetService from "../services/snippetService";
+import toast, { Toaster } from "react-hot-toast";
+import { Search, Code2, Hand, Heart } from "lucide-react";
+
+const SnippetsGrid = ({ pinnedSnippets = false }) => {
+  const navigate = useNavigate();
+  const [snippets, setSnippets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getAllSnippets = async () => {
+    try {
+      setLoading(true);
+
+      const response = await snippetService.getSnippets();
+
+      console.log("Snippets:", response);
+
+      if (Array.isArray(response)) {
+        if(pinnedSnippets) {
+          setSnippets(response.filter(snippet => snippet.isPinned));
+          console.log("Pinned Snippets:", response.filter(snippet => snippet.isPinned));
+        } else {
+          setSnippets(response);
+        }
+      } else {
+        console.error("Unexpected response format:", response);
+      }
+    } catch (error) {
+      console.error("Error fetching snippets:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAllSnippets();
+  }, [pinnedSnippets]);
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await snippetService.deleteSnippet(id);
+      console.log(response);
+      toast.success(response?.message || "Snippet deleted successfully");
+      setSnippets((prev) => prev.filter((snippet) => snippet._id !== id));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete snippet");
+    }
+  };
+
+  const handlePin = async (id) => {
+    try {
+      const response = await snippetService.pinSnippet(id);
+      console.log(response);
+      setSnippets((prev) => {
+        const updatedSnippets = prev.map((snippet) =>
+          snippet._id === id
+            ? { ...snippet, isPinned: !snippet.isPinned }
+            : snippet,
+        );
+
+        if (pinnedSnippets) {
+          return updatedSnippets.filter((snippet) => snippet.isPinned);
+        }
+
+        return updatedSnippets;
+      });
+      if(response?.pinned) {
+        toast.success(response?.message || "Snippet pinned successfully");
+      } else {
+        toast.success(response?.message || "Snippet unpinned successfully");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to pin snippet");
+    }
+  };
+  return (
+    <div className="w-full">
+      <Toaster />
+      {/* Mobile Search */}
+      <div className="md:hidden mb-5">
+        <label className="input input-bordered flex items-center gap-2 rounded-2xl">
+          <Search size={18} />
+
+          <input type="text" className="grow" placeholder="Search notes..." />
+        </label>
+      </div>
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-bold">Your Notes</h2>
+
+          <p className="text-base-content/60 mt-1">
+            Manage and organize your notes
+          </p>
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {snippets.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-24">
+          <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center mb-6">
+            <Code2 size={40} className="text-primary" />
+          </div>
+
+          <h3 className="text-2xl font-bold">
+            {pinnedSnippets ? "No Favourited Snippets" : "No Snippets"}
+          </h3>
+
+          <p className="text-base-content/60 mt-2 max-w-md">
+            {pinnedSnippets
+              ? "Start favouriting your important snippets."
+              : "Start building your personal developer notebook by creating your first snippet."}
+          </p>
+
+          <button
+            onClick={pinnedSnippets ? () => navigate("/dashboard") : () => navigate("/create")}
+            className="btn btn-primary rounded-2xl mt-6"
+          >
+            {pinnedSnippets ? "Favourite Snippets" : "Create First Note"}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {snippets.map((snippet) => (
+            <div
+              key={snippet._id}
+              className="
+                card bg-base-100
+                shadow-lg border border-base-content/10
+                hover:-translate-y-1 hover:shadow-2xl
+                transition-all duration-300
+              "
+            >
+              <div className="card-body">
+                {/* Top */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="card-title text-lg">{snippet.title}</h3>
+
+                    <p className="text-sm text-base-content/60 mt-1">
+                      {snippet.language}
+                    </p>
+                  </div>
+
+                  <div className="w-15 h-11 rounded-2xl flex items-center justify-between pb-3">
+                    <button
+                      className={`${snippet.isPinned ? "fill-red-500 text-red-500" : "text-gray-400"} 
+                      hover:fill-red-500 hover:text-red-500 cursor-pointer`}
+                      onClick={() => handlePin(snippet._id)}
+                    >
+                      <Heart size={20} />
+                    </button>
+                    <Code2
+                      className="text-primary bg-primary/10 rounded-2xl"
+                      size={20}
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-base-content/70 mt-2 line-clamp-3">
+                  {snippet.description}
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {snippet.tags?.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="badge badge-primary badge-outline"
+                    >
+                      {tag}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Actions */}
+                <div className="card-actions justify-end mt-2 items-center">
+                  <button
+                    onClick={() => navigate(`/snippet/${snippet._id}`)}
+                    className="btn btn-sm btn-outline rounded-xl"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(snippet._id)}
+                    className="btn btn-sm btn-outline rounded-xl"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SnippetsGrid;

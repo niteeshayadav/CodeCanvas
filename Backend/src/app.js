@@ -1,0 +1,23 @@
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+app.use(cors({
+    origin: frontendURL,
+    credentials: true
+}));
+
+/* Require all the routes here */
+import authRouter from './routes/auth.routes.js';
+import snippetRouter from './routes/snippet.routes.js';
+
+/* Use the routes here */
+app.use('/api/auth', authRouter);
+app.use('/api/snippets', snippetRouter);
+
+export default app;
