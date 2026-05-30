@@ -18,9 +18,9 @@ export default function LoginPage() {
 
   //Handle remember me
   const handlerememberMe = () => {
-    setRegisterData({
-      ...registerData,
-      rememberMe: !registerData.rememberMe,
+    setLoginData({
+      ...loginData,
+      rememberMe: !loginData.rememberMe,
     });
   };
 
@@ -140,6 +140,7 @@ export default function LoginPage() {
                     <input
                       type="checkbox"
                       className="checkbox checkbox-primary checkbox-sm"
+                      checked={loginData.rememberMe}
                       onChange={handlerememberMe}
                     />
                     <span className="label-text">Remember me</span>

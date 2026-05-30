@@ -1,3 +1,4 @@
+import { useParams } from 'react-router-dom';
 import api from './api';
 
 const createSnippet = async ({title,language,code,description,tags}) => {
@@ -10,9 +11,11 @@ const createSnippet = async ({title,language,code,description,tags}) => {
     }
 };
 
-const getSnippets = async () => {
+const getSnippets = async (filter) => {
     try {
-        const response = await api.get('/snippets');
+        const response = await api.get('/snippets',{
+            params: filter
+        });
         return response.data;
     } catch (error) {
         console.error('Get Snippets error:', error);
@@ -59,13 +62,29 @@ const pinSnippet = async (id) => {
         throw error;
     }
 }
+
+const searchSnippets = async (searchQuery) => {
+    try {
+        const response = await api.get('/snippets/search',{
+            params: {
+                q: searchQuery
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error?.response?.data?.message || 'Search Snippets error:');
+        throw error;
+    }
+}
+
 const snippetService = {
     createSnippet,
     getSnippets,
     getSnippetById,
     updateSnippet,
     deleteSnippet,
-    pinSnippet
+    pinSnippet,
+    searchSnippets
 };
 
 export default snippetService;

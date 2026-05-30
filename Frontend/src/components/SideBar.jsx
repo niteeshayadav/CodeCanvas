@@ -28,9 +28,9 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, name }) => {
       path: "/create",
     },
     {
-      label: "Favorites",
+      label: "Favourites",
       icon: <Heart size={20} />,
-      path: "/snippets/favorites",
+      path: "/snippets/favourites",
     },
   ];
 

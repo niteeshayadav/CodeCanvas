@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import snippetService from "../services/snippetService";
 import toast, { Toaster } from "react-hot-toast";
-import { Search, Code2, Hand, Heart } from "lucide-react";
+import { Search, Code2, Hand, Heart, Funnel } from "lucide-react";
+import FilterModal from "./FilterModal";
 
 const SnippetsGrid = ({ pinnedSnippets = false }) => {
   const navigate = useNavigate();
   const [snippets, setSnippets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterData, setFilterData] = useState({
+      language: "",
+      tags: "",
+      favouritesOnly : false
+    });
 
+  const handleSearch = async (searchQuery) => {
+    try {
+      const response = await snippetService.searchSnippets(searchQuery);
+      setSnippets(response);
+    } catch (error) {
+      console.error("Error fetching snippets:", error);
+    }
+  };
   const getAllSnippets = async () => {
     try {
       setLoading(true);
@@ -19,11 +34,14 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
       console.log("Snippets:", response);
 
       if (Array.isArray(response)) {
-        if(pinnedSnippets) {
-          setSnippets(response.filter(snippet => snippet.isPinned));
-          console.log("Pinned Snippets:", response.filter(snippet => snippet.isPinned));
+        if (pinnedSnippets) {
+          const pinnedSnippets = response.filter((snippet) => snippet.isPinned);
+          setSnippets(pinnedSnippets);
         } else {
-          setSnippets(response);
+          const sortedSnippets = [...response].sort((a, b) => {
+            return b.isPinned - a.isPinned;
+          }); // Create a copy of the array to avoid modifying the original response by spreading it
+          setSnippets(sortedSnippets);
         }
       } else {
         console.error("Unexpected response format:", response);
@@ -36,9 +54,15 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
   };
 
   useEffect(() => {
-    getAllSnippets();
-  }, [pinnedSnippets]);
-
+    const timeout = setTimeout(() => {
+      if (query.trim() !== "") {
+        handleSearch(query);
+      } else {
+        getAllSnippets();
+      }
+    },500);
+    return () => clearTimeout(timeout);
+  }, [query, pinnedSnippets]);
 
   if (loading) {
     return (
@@ -48,6 +72,9 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
     );
   }
 
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -64,6 +91,7 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
     try {
       const response = await snippetService.pinSnippet(id);
       console.log(response);
+
       setSnippets((prev) => {
         const updatedSnippets = prev.map((snippet) =>
           snippet._id === id
@@ -71,13 +99,16 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
             : snippet,
         );
 
+        // Favorites page
         if (pinnedSnippets) {
           return updatedSnippets.filter((snippet) => snippet.isPinned);
         }
 
-        return updatedSnippets;
+        // Dashboard page
+        return updatedSnippets.sort((a, b) => b.isPinned - a.isPinned);
       });
-      if(response?.pinned) {
+
+      if (response?.pinned) {
         toast.success(response?.message || "Snippet pinned successfully");
       } else {
         toast.success(response?.message || "Snippet unpinned successfully");
@@ -86,26 +117,60 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
       toast.error(error?.response?.data?.message || "Failed to pin snippet");
     }
   };
+
+  const handleFilter = () => {
+    setIsModalOpen(!isModalOpen);
+  };
   return (
     <div className="w-full">
       <Toaster />
-      {/* Mobile Search */}
-      <div className="md:hidden mb-5">
-        <label className="input input-bordered flex items-center gap-2 rounded-2xl">
-          <Search size={18} />
-
-          <input type="text" className="grow" placeholder="Search notes..." />
-        </label>
-      </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-5 mb-8 md:flex-row md:items-center md:justify-between">
+        {/* Left Section */}
         <div>
           <h2 className="text-3xl font-bold">Your Notes</h2>
 
           <p className="text-base-content/60 mt-1">
             Manage and organize your notes
           </p>
+        </div>
+
+        {/* Right Section */}
+        <div className=" flex items-center gap-3 w-full md:w-auto">
+          {/* Search */}
+          <label className="input input-bordered rounded-2xl flex items-center gap-3 flex-1 md:w-[420px] focus-within:outline-none focus-within:border-primary/30">
+            <Search size={18} className="text-base-content/60" />
+
+            <input
+              type="text"
+              className="grow"
+              name="query"
+              value={query}
+              onChange={handleChange}
+              placeholder="Search notes..."
+            />
+          </label>
+
+          {/* Filter Button */}
+          <div className="relative">
+            <button
+              className="w-10 h-10 md:w-12 md:h-12 border border-primary/80 hover:border-primary transition-all rounded-2xl flex items-center justify-center shrink-0"
+              onClick={handleFilter}
+            >
+              <Funnel size={20} />
+            </button>
+
+            <FilterModal
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              pinnedSnippets={pinnedSnippets}
+              filterData={filterData}
+              setFilterData={setFilterData}
+              snippets={snippets}
+              setSnippets={setSnippets}
+            />
+          </div>
         </div>
       </div>
 
@@ -127,7 +192,11 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
           </p>
 
           <button
-            onClick={pinnedSnippets ? () => navigate("/dashboard") : () => navigate("/create")}
+            onClick={
+              pinnedSnippets
+                ? () => navigate("/dashboard")
+                : () => navigate("/create")
+            }
             className="btn btn-primary rounded-2xl mt-6"
           >
             {pinnedSnippets ? "Favourite Snippets" : "Create First Note"}

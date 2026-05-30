@@ -52,7 +52,7 @@ const App = () => {
 
         <Route path="/edit/:id" element={<SnippetForm isEdit={true} />} />
 
-        <Route path="/snippets/favorites" element={<Favourites />} />
+        <Route path="/snippets/favourites" element={<Favourites />} />
         
         <Route path="/snippet/:id" element={<SnippetDetails />} />
 

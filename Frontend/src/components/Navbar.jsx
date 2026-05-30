@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import SearchBar from "./SearchBar";
 import { Menu, Search, Heart, Plus, Code2 } from "lucide-react";
 
 const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -36,8 +35,6 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
         </div>
       </div>
 
-      <SearchBar />
-
       {/* Desktop Actions */}
       <div className="hidden lg:flex items-center gap-2">
         <button
@@ -48,7 +45,7 @@ const Navbar = ({ sidebarOpen, setSidebarOpen }) => {
         </button>
 
         <button
-          onClick={() => navigate("/snippets/favorites")}
+          onClick={() => navigate("/snippets/favourites")}
           className="btn btn-ghost gap-2 rounded-xl"
         >
           <Heart size={18} />

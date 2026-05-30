@@ -12,6 +12,13 @@ const snippetRouter = express.Router();
 snippetRouter.post('/', authenticatedUser, snippetController.createSnippet);
 
 /**
+ * @route GET /api/snippets/search
+ * @desc Search snippets by title or content
+ * @access Private
+ */
+snippetRouter.get('/search', authenticatedUser, snippetController.searchSnippets);
+
+/**
  * @route GET /api/snippets
  * @desc Get all snippets
  * @access Private
@@ -39,13 +46,6 @@ snippetRouter.patch('/:id', authenticatedUser, snippetController.updateSnippet);
  */
 snippetRouter.delete('/:id', authenticatedUser, snippetController.deleteSnippet);
 
-
-/**
- * @route GET /api/snippets/search
- * @desc Search snippets by title or content
- * @access Private
- */
-snippetRouter.get('/search', authenticatedUser, snippetController.searchSnippets);
 
 /**
  * @name pinSnippet
