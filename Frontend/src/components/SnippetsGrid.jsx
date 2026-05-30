@@ -4,6 +4,7 @@ import snippetService from "../services/snippetService";
 import toast, { Toaster } from "react-hot-toast";
 import { Search, Code2, Hand, Heart, Funnel } from "lucide-react";
 import FilterModal from "./FilterModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const SnippetsGrid = ({ pinnedSnippets = false }) => {
   const navigate = useNavigate();
@@ -11,11 +12,17 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [snippetToDelete, setSnippetToDelete] = useState({
+    id: "",
+    title: "",
+  });
+
   const [filterData, setFilterData] = useState({
-      language: "",
-      tags: "",
-      favouritesOnly : false
-    });
+    language: "",
+    tags: "",
+    favouritesOnly: false,
+  });
 
   const handleSearch = async (searchQuery) => {
     try {
@@ -30,8 +37,6 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
       setLoading(true);
 
       const response = await snippetService.getSnippets();
-
-      console.log("Snippets:", response);
 
       if (Array.isArray(response)) {
         if (pinnedSnippets) {
@@ -60,7 +65,7 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
       } else {
         getAllSnippets();
       }
-    },500);
+    }, 500);
     return () => clearTimeout(timeout);
   }, [query, pinnedSnippets]);
 
@@ -76,21 +81,9 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
     setQuery(e.target.value);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await snippetService.deleteSnippet(id);
-      console.log(response);
-      toast.success(response?.message || "Snippet deleted successfully");
-      setSnippets((prev) => prev.filter((snippet) => snippet._id !== id));
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to delete snippet");
-    }
-  };
-
   const handlePin = async (id) => {
     try {
       const response = await snippetService.pinSnippet(id);
-      console.log(response);
 
       setSnippets((prev) => {
         const updatedSnippets = prev.map((snippet) =>
@@ -119,8 +112,13 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
   };
 
   const handleFilter = () => {
-    setIsModalOpen(!isModalOpen);
+    setIsModalOpen(true);
   };
+
+  const handleDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
   return (
     <div className="w-full">
       <Toaster />
@@ -227,11 +225,19 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
 
                   <div className="w-15 h-11 rounded-2xl flex items-center justify-between pb-3">
                     <button
-                      className={`${snippet.isPinned ? "fill-red-500 text-red-500" : "text-gray-400"} 
-                      hover:fill-red-500 hover:text-red-500 cursor-pointer`}
                       onClick={() => handlePin(snippet._id)}
+                      className="cursor-pointer"
                     >
-                      <Heart size={20} />
+                      <Heart
+                        size={20}
+                        strokeWidth={1.5}
+                        className={`transition-colors ${
+                          snippet.isPinned
+                            ? "fill-red-500 text-red-500"
+                            : "text-gray-400 hover:text-red-500 hover:fill-red-500"
+                        }
+                               `}
+                      />
                     </button>
                     <Code2
                       className="text-primary bg-primary/10 rounded-2xl"
@@ -267,8 +273,14 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
                   </button>
 
                   <button
-                    onClick={() => handleDelete(snippet._id)}
-                    className="btn btn-sm btn-outline rounded-xl"
+                    onClick={() => {
+                      setSnippetToDelete({
+                        id: snippet._id,
+                        title: snippet.title,
+                      });
+                      handleDeleteModal();
+                    }}
+                    className="btn btn-sm btn-outline text-red-500 rounded-xl"
                   >
                     Delete
                   </button>
@@ -276,6 +288,14 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
               </div>
             </div>
           ))}
+          <ConfirmDeleteModal
+            isDeleteModalOpen={isDeleteModalOpen}
+            setIsDeleteModalOpen={setIsDeleteModalOpen}
+            snippetId={snippetToDelete.id}
+            snippetTitle={snippetToDelete.title}
+            snippets={snippets}
+            setSnippets={setSnippets}
+          />
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
 
     const { user, loading } = useAuth();
 
-    // SHOW LOADING WHILE CHECKING AUTH
+    // Show loading while checking Auth
 
     if (loading) {
         return (
@@ -16,13 +16,13 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
-    // IF USER NOT LOGGED IN
+    // If user not logged in
 
     if (!user) {
         return <Navigate to="/login" replace />;
     }
 
-    // IF USER LOGGED IN
+    // If user logged in
 
     return children;
 };

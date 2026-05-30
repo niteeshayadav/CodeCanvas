@@ -39,11 +39,13 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      await login(loginData);
 
+      await login(loginData);
       toast.success("Login successful");
       navigate("/dashboard");
-    } catch (error) {
+
+    } 
+    catch (error) {
       toast.error(error.response?.data?.message || "Invalid email or password");
     }
   };
@@ -56,7 +58,7 @@ export default function LoginPage() {
         {/* Left Section */}
         <div className="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-neutral to-base-300">
           <h1 className="text-5xl font-bold mb-4">
-            Dev<span className="text-primary">Notes</span>
+            Code<span className="text-primary">Canvas</span>
           </h1>
 
           <p className="text-base-content/70 text-lg mb-8">
@@ -73,7 +75,7 @@ export default function LoginPage() {
             </pre>
 
             <pre data-prefix=">">
-              <code>Welcome to DevNotes</code>
+              <code>Welcome to Code Canvas</code>
             </pre>
           </div>
         </div>
@@ -101,7 +103,7 @@ export default function LoginPage() {
                     value={loginData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full outline-none focus:outline-none"
                     required
                   />
                 </div>
@@ -119,7 +121,7 @@ export default function LoginPage() {
                       value={loginData.password}
                       onChange={handleChange}
                       placeholder="Enter your password"
-                      className="input input-bordered w-full pr-12"
+                      className="input input-bordered w-full pr-12 outline-none focus:outline-none"
                       required
                     />
 

@@ -48,21 +48,26 @@ const registerUser = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
         );
+
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          SameSite: "None",
+        };
         
         if(rememberMe) {
-            res.cookie("token", token, {
-              maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
+            cookieOptions.maxAge = 7 * 24 * 60 * 60 * 1000;
         }
        
-        res.cookie("token", token);
+        res.cookie("token", token, cookieOptions);
 
         res.status(201).json({ 
             message: 'User registered successfully',
             user: {
                 id: NewUser._id,
                 username: NewUser.username,
-                email: NewUser.email
+                fullname: NewUser.fullname,
+                email: NewUser.email,
             }
         });
 
@@ -113,20 +118,25 @@ const loginUser = async (req, res) => {
     { expiresIn: "7d" }
     );
     
-    if(rememberMe){
-        res.cookie("token", token, {
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      SameSite: "None",
+    };
+
+    if (rememberMe) {
+      cookieOptions.maxAge = 7 * 24 * 60 * 60 * 1000;
     }
 
-    res.cookie("token", token);
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).json({
         message: 'User logged in successfully',
         user: {
             id: ExistingUser._id,
             username: ExistingUser.username,
-            email: ExistingUser.email
+            fullname: ExistingUser.fullname,
+            email: ExistingUser.email,
         }
     });
     }

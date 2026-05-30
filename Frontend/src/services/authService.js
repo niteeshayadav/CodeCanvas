@@ -36,7 +36,6 @@ const logout = async () => {
 const getCurrentUser = async () => {
     try{
         const response = await api.get('/auth/me');
-        console.log('Get Current User response:', response.data);
         return response.data;
     } catch (error) {
         console.error('Get Current User error:', error.response ? error.response.data : error.message);

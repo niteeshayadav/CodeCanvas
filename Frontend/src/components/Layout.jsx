@@ -6,13 +6,19 @@ import {useAuth} from "../context/AuthContext";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const {user} = useAuth();
+  const {loading} = useAuth();
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
   return (
     <div className="h-screen w-full flex bg-base-300 overflow-hidden">
       {/* Sidebar */}
       <Sidebar
-        name={user?.fullname}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />

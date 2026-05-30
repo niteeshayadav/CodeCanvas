@@ -13,9 +13,9 @@ import {
   X,
 } from "lucide-react";
 
-const SideBar = ({ sidebarOpen, setSidebarOpen, name }) => {
+const SideBar = ({ sidebarOpen, setSidebarOpen}) => {
   const navigate = useNavigate();
-  const {logout} = useAuth();
+  const {user, logout} = useAuth();
   const navItems = [
     {
       label: "Dashboard",
@@ -70,14 +70,19 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, name }) => {
           </div>
 
           {/* Profile */}
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-bold shadow-lg">
-              {name?.charAt(0).toUpperCase()}
+          <div className="flex flex-col items-center text-center mb-8 bg-base-200/40 p-4 rounded-2xl border border-base-content/5">
+            
+            <div className="w-20 h-20 rounded-full bg-primary text-primary-content flex items-center justify-center text-3xl font-semibold shadow-md ring-4 ring-primary/10">
+              {user?.fullname?.charAt(0).toUpperCase()}
             </div>
 
-            <h2 className="mt-5 text-2xl font-bold">Welcome Back!</h2>
+            <h2 className="mt-5 text-xs font-bold tracking-[0.15em] uppercase text-base-content/80">
+              Welcome Back
+            </h2>
 
-            <p className="text-base-content/60 mt-1">{name}</p>
+            <p className="mt-1 text-xl font-semibold tracking-tight text-base-content/90 dark:text-neutral-100 antialiased">
+              {user?.fullname}
+            </p>
           </div>
 
           {/* Navigation */}
@@ -126,8 +131,8 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, name }) => {
             {/* Logout */}
             <li>
               <button
-              onClick={logout}
-              className="
+                onClick={logout}
+                className="
                 w-full flex items-center gap-3
                 px-4 py-3 rounded-2xl
                 text-error hover:bg-error/10

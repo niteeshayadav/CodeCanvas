@@ -59,7 +59,7 @@ export default function RegisterPage() {
         {/* Left Section */}
         <div className="hidden lg:flex flex-col justify-center p-12 bg-gradient-to-br from-neutral to-base-300">
           <h1 className="text-5xl font-bold mb-4">
-            Dev<span className="text-primary">Notes</span>
+            Code<span className="text-primary">Canvas</span>
           </h1>
 
           <p className="text-base-content/70 text-lg mb-8">
@@ -104,7 +104,7 @@ export default function RegisterPage() {
                     name="username"
                     value={registerData.username}
                     onChange={handleChange}
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full outline-none focus:outline-none"
                   />
                 </div>
 
@@ -120,7 +120,7 @@ export default function RegisterPage() {
                     name="fullname"
                     value={registerData.fullname}
                     onChange={handleChange}
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full outline-none focus:outline-none"
                   />
                 </div>
 
@@ -136,7 +136,7 @@ export default function RegisterPage() {
                     value={registerData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full outline-none focus:outline-none"
                   />
                 </div>
 
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                       value={registerData.password}
                       onChange={handleChange}
                       placeholder="Create password"
-                      className="input input-bordered w-full pr-12"
+                      className="input input-bordered w-full pr-12 outline-none focus:outline-none"
                     />
 
                     <button

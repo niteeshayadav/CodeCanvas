@@ -1,19 +1,14 @@
 import React from "react";
 import { X, Tag } from "lucide-react";
 import snippetService from "../services/snippetService";
-import { useNavigate } from "react-router-dom";
 
 export default function FilterModal({
   isModalOpen,
   setIsModalOpen,
   filterData,
   setFilterData,
-  snippets,
-  setSnippets
+  setSnippets,
 }) {
-
-  const navigate = useNavigate();
-
   const Languages = [
     "JavaScript",
     "TypeScript",
@@ -29,9 +24,11 @@ export default function FilterModal({
   }
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
     setFilterData({
       ...filterData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -49,24 +46,24 @@ export default function FilterModal({
       favouritesOnly: false,
     });
 
-    try{
+    try {
       const response = await snippetService.getSnippets();
+
       setSnippets(response);
-    }
-    catch(error){
+
+      setIsModalOpen(false);
+    } catch (error) {
       console.error(error?.response?.data?.message || "Get Snippets error");
     }
-
-    setIsModalOpen(false);
   };
 
   const handleApply = async (e) => {
     e.preventDefault();
 
     try {
-    
       const filter = {
         ...filterData,
+
         tags: filterData.tags
           ? filterData.tags
               .split(",")
@@ -76,16 +73,11 @@ export default function FilterModal({
           : "",
       };
 
-      if(filterData.favouritesOnly){
-        setIsModalOpen(false);
-        return navigate("/snippets/favourites");
-      }
       const response = await snippetService.getSnippets(filter);
 
       setSnippets(response);
 
       setIsModalOpen(false);
-
     } catch (error) {
       console.error(error?.response?.data?.message || "Get Snippets error");
     }
@@ -100,7 +92,7 @@ export default function FilterModal({
       />
 
       {/* Modal */}
-      <div className="absolute top-14 right-0 sm:right-0 z-50">
+      <div className="absolute top-14 right-2 sm:right-0 z-50">
         <form
           onSubmit={handleApply}
           className="bg-base-200 border border-base-300 w-[92vw] max-w-80 p-5 sm:p-6 rounded-3xl shadow-2xl"
@@ -172,7 +164,7 @@ export default function FilterModal({
             </label>
           </div>
 
-          {/* Favorites */}
+          {/* Favourites */}
           <div className="form-control mb-7">
             <label className="label cursor-pointer justify-start gap-3">
               <input

@@ -41,19 +41,26 @@ const getAllSnippets = async (req, res) => {
     const filter = {
       user: req.user.id,
     };
-    // If a language query parameter is provided, add it to the filter
+    
+    // Language filter
     if (req.query.language) {
       filter.language = {
         $regex: req.query.language,
         $options: "i",
       };
     }
-    // If a tag query parameter is provided, add it to the filter
+
+    // Tags filter
     if (req.query.tags) {
       const tagsArray = req.query.tags.split(",");
       filter.tags = {
         $in: tagsArray.map((tag) => new RegExp(tag, "i")),
       };
+    }
+
+    // Favouries Only filter
+    if (req.query.favouritesOnly === "true") {
+      filter.isPinned = true;
     }
     const snippets = await Snippet.find(filter).sort({ createdAt: -1 }); //{ createdAt: -1 } means Sort by createdAt in descending order
     res.status(200).json(snippets);
