@@ -5,7 +5,7 @@ import Snippet from "../models/snippet.model.js";
  * @desc Create a new snippet, expects title, language, description, code and tags in the request body
  * @access Private
  */
-const createSnippet = async (req, res) => {
+const createSnippet = async (req, res, next) => {
   const { title, language, code, description, tags } = req.body;
   if (!title || !language || !code || !description || !tags) {
     return res.status(400).json({ message: "All fields are required" });
@@ -24,10 +24,7 @@ const createSnippet = async (req, res) => {
       newSnippet,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
@@ -36,7 +33,7 @@ const createSnippet = async (req, res) => {
  * @desc Get all snippets for the authenticated user
  * @access Private
  */
-const getAllSnippets = async (req, res) => {
+const getAllSnippets = async (req, res, next) => {
   try {
     const filter = {
       user: req.user.id,
@@ -65,10 +62,7 @@ const getAllSnippets = async (req, res) => {
     const snippets = await Snippet.find(filter).sort({ createdAt: -1 }); //{ createdAt: -1 } means Sort by createdAt in descending order
     res.status(200).json(snippets);
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
@@ -77,7 +71,7 @@ const getAllSnippets = async (req, res) => {
  * @desc Get a snippet by ID for the authenticated user
  * @access Private
  */
-const getSnippetById = async (req, res) => {
+const getSnippetById = async (req, res, next) => {
   const { id } = req.params;
   try {
     const snippet = await Snippet.findOne({ _id: id, user: req.user.id });
@@ -89,10 +83,7 @@ const getSnippetById = async (req, res) => {
       snippet,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
@@ -101,7 +92,7 @@ const getSnippetById = async (req, res) => {
  * @desc Update a snippet by ID for the authenticated user
  * @access Private
  */
-const updateSnippet = async (req, res) => {
+const updateSnippet = async (req, res, next) => {
   const { id } = req.params;
   const { title, language, description, code, tags } = req.body;
   try {
@@ -120,10 +111,7 @@ const updateSnippet = async (req, res) => {
       snippet,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
@@ -132,7 +120,7 @@ const updateSnippet = async (req, res) => {
  * @desc Delete a snippet by ID for the authenticated user
  * @access Private
  */
-const deleteSnippet = async (req, res) => {
+const deleteSnippet = async (req, res, next) => {
   const { id } = req.params;
   try {
     const snippet = await Snippet.findOneAndDelete({
@@ -144,10 +132,7 @@ const deleteSnippet = async (req, res) => {
     }
     res.status(200).json({ message: "Snippet deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 /**
@@ -155,7 +140,7 @@ const deleteSnippet = async (req, res) => {
  * @desc Search snippets by title or content for the authenticated user, expects a query parameter 'q' in the request
  * @access Private
  */
-const searchSnippets = async (req, res) => {
+const searchSnippets = async (req, res, next) => {
   const { q } = req.query;
   if (!q) {
     return res.status(400).json({ message: "Query parameter q is required" });
@@ -172,13 +157,10 @@ const searchSnippets = async (req, res) => {
     });
     res.status(200).json(snippets);
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
-const pinSnippet = async (req, res) => {
+const pinSnippet = async (req, res, next) => {
   const { id } = req.params;
   try {
     const snippet = await Snippet.findOne({ _id: id, user: req.user.id });
@@ -199,10 +181,7 @@ const pinSnippet = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 };
 

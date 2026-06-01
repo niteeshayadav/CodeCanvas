@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
  * @access Public
  */
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
     const { username, fullname, email, password, rememberMe } = req.body;
     if (!username || !fullname || !email || !password) {
         return res.status(400).json({ 
@@ -52,7 +52,7 @@ const registerUser = async (req, res) => {
         const cookieOptions = {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          SameSite: "None",
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
         };
         
         if(rememberMe) {
@@ -73,10 +73,7 @@ const registerUser = async (req, res) => {
 
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ 
-            message: 'Server error' 
-        });
+        next(err);
     }
 }
 
@@ -87,7 +84,7 @@ const registerUser = async (req, res) => {
  * @access Public 
  */
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     const { email, password, rememberMe } = req.body;
     if (!email || !password) {
         return res.status(400).json({ 
@@ -121,7 +118,7 @@ const loginUser = async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      SameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     };
 
     if (rememberMe) {
@@ -141,10 +138,7 @@ const loginUser = async (req, res) => {
     });
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ 
-            message: 'Server error' 
-        });
+        next(err);
     }
 }
 
@@ -154,7 +148,7 @@ const loginUser = async (req, res) => {
  * @access Public
  */
 
-const logoutUser = async (req,res) => {
+const logoutUser = async (req,res,next) => {
     const token = req.cookies.token;
     if (!token) {
         return res.status(400).json({
@@ -169,10 +163,7 @@ const logoutUser = async (req,res) => {
         });
     }
     catch(err){
-        console.error(err);
-        res.status(500).json({ 
-            message: 'Server error' 
-        });
+        next(err);
     }
 }
 
@@ -182,8 +173,9 @@ const logoutUser = async (req,res) => {
  * @access Private
  */
 
-const getMe = async (req, res) => {
-    const user = await User.findById(req.user.id).select('-password'); // Exclude the password field from the response
+const getMe = async (req, res, next) => {
+    try{
+        const user = await User.findById(req.user.id).select('-password'); // Exclude the password field from the response
     res.status(200).json({
         message: 'User details fetched successfully',
         user: {
@@ -193,6 +185,10 @@ const getMe = async (req, res) => {
             email: user.email
         }
     });
+    }
+    catch(err){
+        next(err);
+    }
 }
 
 const authController = {

@@ -1,6 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import errorMiddleware from './middlewares/error.middleware.js';
+
 const app = express();
 
 app.use(express.json());
@@ -17,7 +19,10 @@ import authRouter from './routes/auth.routes.js';
 import snippetRouter from './routes/snippet.routes.js';
 
 /* Use the routes here */
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authRouter); 
 app.use('/api/snippets', snippetRouter);
+
+/* Error Middleware */
+app.use(errorMiddleware);
 
 export default app;
