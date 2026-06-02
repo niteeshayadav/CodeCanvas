@@ -169,8 +169,10 @@ export default function SnippetForm({isEdit}) {
             </div>
           </div>
 
-          <button className="btn btn-ghost gap-2 hidden md:flex"
-            onClick={() => navigate("/dashboard")}>
+          <button
+            className="btn btn-ghost gap-2 hidden md:flex"
+            onClick={() => navigate("/dashboard")}
+          >
             <ChevronLeft size={18} />
             Back
           </button>

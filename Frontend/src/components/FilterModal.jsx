@@ -48,8 +48,10 @@ export default function FilterModal({
 
     try {
       const response = await snippetService.getSnippets();
-
-      setSnippets(response);
+      const sortedSnippets = [...response].sort((a, b) => {
+        return b.isPinned - a.isPinned;
+      });
+      setSnippets(sortedSnippets);
 
       setIsModalOpen(false);
     } catch (error) {
