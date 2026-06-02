@@ -14,7 +14,6 @@ import {
 
 
 export default function SnippetForm({isEdit}) {
-  
   const { loading } = useAuth();
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
@@ -170,7 +169,8 @@ export default function SnippetForm({isEdit}) {
             </div>
           </div>
 
-          <button className="btn btn-ghost gap-2 hidden md:flex">
+          <button className="btn btn-ghost gap-2 hidden md:flex"
+            onClick={() => navigate("/dashboard")}>
             <ChevronLeft size={18} />
             Back
           </button>
