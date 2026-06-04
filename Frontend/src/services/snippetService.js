@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import api from './api';
 
 const createSnippet = async ({title,language,code,description,tags}) => {

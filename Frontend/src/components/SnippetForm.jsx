@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import snippetService from "../services/snippetService";
 import { useAuth } from "../context/AuthContext";
 import toast, { Toaster } from "react-hot-toast";
+import Editor from "@monaco-editor/react";
 import {
   Code2,
   Bookmark,
@@ -12,8 +13,20 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
+const languageMap = {
+  JavaScript: "javascript",
+  TypeScript: "typescript",
+  React: "javascript",
+  "Node.js": "javascript",
+  Python: "python",
+  Java: "java",
+  "C++": "cpp",
+  HTML: "html",
+  CSS: "css",
+  SQL: "sql",
+};
 
-export default function SnippetForm({isEdit}) {
+export default function SnippetForm({ isEdit }) {
   const { loading } = useAuth();
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({
@@ -21,12 +34,21 @@ export default function SnippetForm({isEdit}) {
     language: "",
     tags: "",
     description: "",
-    code:""
+    code: "",
   });
+  const [isLargeScreen, setIsLargeScreen] = useState(
+    () => window.innerWidth >= 1024,
+  );
   const { id } = useParams();
 
-  const fetchSnippet = async () =>{
-    try{
+  useEffect(() => {
+    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const fetchSnippet = async () => {
+    try {
       const response = await snippetService.getSnippetById(id);
       const snippet = response.snippet;
 
@@ -35,19 +57,18 @@ export default function SnippetForm({isEdit}) {
         language: snippet.language,
         tags: snippet.tags.join(", "),
         description: snippet.description,
-        code: snippet.code
+        code: snippet.code,
       });
+    } catch (error) {
+      console.error("Error fetching snippet:", error);
     }
-    catch(error){
-      console.error('Error fetching snippet:', error);
-    }
-  }
+  };
 
-  useEffect(()=>{
-    if(isEdit){
+  useEffect(() => {
+    if (isEdit) {
       fetchSnippet();
     }
-  },[id,isEdit]);
+  }, [id, isEdit]);
 
   const Languages = [
     "JavaScript",
@@ -57,8 +78,10 @@ export default function SnippetForm({isEdit}) {
     "Python",
     "Java",
     "C++",
+    "HTML",
+    "CSS",
+    "SQL",
   ];
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,13 +93,12 @@ export default function SnippetForm({isEdit}) {
   };
 
   const handleClear = () => {
-
     setInputData({
       title: "",
       language: "",
       tags: "",
       description: "",
-      code:""
+      code: "",
     });
   };
 
@@ -103,38 +125,35 @@ export default function SnippetForm({isEdit}) {
         return;
       }
 
-      if(isEdit){
-        try{
-            const response = await snippetService.updateSnippet(id,{...snippetData});
-            console.log(response);
-            toast.success(response.message || "Snippet updated successfully");
-            setTimeout(() => {
-              navigate("/dashboard");
-            }, 1000);
+      if (isEdit) {
+        try {
+          const response = await snippetService.updateSnippet(id, {
+            ...snippetData,
+          });
+          console.log(response);
+          toast.success(response.message || "Snippet updated successfully");
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
+        } catch (error) {
+          toast.error(
+            error.response?.data?.message || "Failed to create snippet",
+          );
         }
-        catch(error){
-            toast.error(
-              error.response?.data?.message || "Failed to create snippet",
-            );
-        }
-      }
-      else{
+      } else {
         try {
           const response = await snippetService.createSnippet({
-            ...snippetData
+            ...snippetData,
           });
-          toast.success(
-            response.message || "Snippet created successfully"
-          );
+          toast.success(response.message || "Snippet created successfully");
           navigate("/dashboard");
         } catch (error) {
           toast.error(
-            error.response?.data?.message || "Failed to create snippet"
+            error.response?.data?.message || "Failed to create snippet",
           );
         }
       }
-    } 
-    catch (error) {
+    } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create snippet");
     }
   };
@@ -331,13 +350,35 @@ export default function SnippetForm({isEdit}) {
             </div>
 
             {/* Editor */}
-            <textarea
-              name="code"
-              value={inputData.code}
-              onChange={handleInputChange}
-              className="flex-1 w-full bg-transparent text-gray-100 p-4 outline-none resize-none font-mono text-sm leading-7 overflow-auto"
-              placeholder="// Write your code here..."
-            />
+            {isLargeScreen ? (
+              <Editor
+                height="100%"
+                language={languageMap[inputData.language] || "plaintext"}
+                value={inputData.code}
+                onChange={(value) =>
+                  setInputData((prev) => ({ ...prev, code: value ?? "" }))
+                }
+                theme="vs-dark"
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: "monospace",
+                  wordWrap: "on",
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  padding: { top: 16 },
+                  lineNumbers: "on",
+                }}
+              />
+            ) : (
+              <textarea
+                name="code"
+                value={inputData.code}
+                onChange={handleInputChange}
+                className="flex-1 w-full bg-transparent text-gray-100 p-4 outline-none resize-none font-mono text-sm leading-7 overflow-auto"
+                placeholder="// Write your code here..."
+              />
+            )}
           </div>
         </div>
       </div>
