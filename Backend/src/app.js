@@ -10,7 +10,10 @@ app.use(cookieParser());
 const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 app.use(cors({
-    origin: clientURL,
+    origin: [
+        clientURL,
+        "http://localhost:5173"
+    ],
     credentials: true
 }));
 
