@@ -10,6 +10,9 @@ const blacklistSchema = new mongoose.Schema({
     timestamps: true
 })
 
+//Time to live for the blacklisted token, default is 7 days
+blacklistSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 });
+
 const BlackList = mongoose.model('BlackList', blacklistSchema);
 
 export default BlackList;
