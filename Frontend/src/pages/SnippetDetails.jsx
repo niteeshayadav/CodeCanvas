@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { Copy, Pencil, Trash2, Tag, Check } from "lucide-react";
+import { Copy, Pencil, Trash2, Tag, Check, ChevronLeft } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import snippetService from "../services/snippetService";
@@ -52,10 +52,34 @@ export default function SnippetDetails() {
       </div>
     );
   }
+
+  const languageMap = {
+    JavaScript: "javascript",
+    TypeScript: "typescript",
+    React: "javascript",
+    "Node.js": "javascript",
+    Python: "python",
+    Java: "java",
+    "C++": "cpp",
+    HTML: "html",
+    CSS: "css",
+    SQL: "sql",
+  };
+
+
   return (
     <div className="min-h-screen bg-base-300 p-4 md:p-8">
       <Toaster />
       <div className="max-w-6xl mx-auto">
+        {/* Back Button */}
+        <button
+          className="btn btn-ghost gap-2 mb-6"
+          onClick={() => navigate("/dashboard")}
+        >
+          <ChevronLeft size={18} />
+          Back
+        </button>
+        
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
           {/* Left Section */}
@@ -114,7 +138,7 @@ export default function SnippetDetails() {
         </div>
 
         {/* Editor Container */}
-        <div className="rounded-2xl overflow-hidden border border-base-content/10 shadow-2xl bg-[#1e1e1e]">
+        <div className="min-w-0 rounded-2xl border border-base-content/10 shadow-2xl bg-[#1e1e1e]">
           {/* Top Bar */}
           <div className="flex items-center justify-between px-2 md:px-5 py-3 border-b border-white/10 bg-[#252526]">
             <div className="flex items-center gap-2">
@@ -139,7 +163,7 @@ export default function SnippetDetails() {
           {/* Monaco Editor */}
           <Editor
             height="75vh"
-            language={snippet.language}
+            language={languageMap[snippet.language] || "plaintext"}
             value={snippet.code}
             theme="vs-dark"
             options={{
@@ -147,9 +171,15 @@ export default function SnippetDetails() {
               minimap: { enabled: false },
               fontSize: 15,
               fontFamily: "monospace",
+              fontLigatures: true,
               wordWrap: "on",
+              wrappingIndent: "same",
               scrollBeyondLastLine: false,
               automaticLayout: true,
+              scrollbar: {
+                horizontal: "auto",
+                vertical: "auto",
+              },
               padding: {
                 top: 20,
               },
