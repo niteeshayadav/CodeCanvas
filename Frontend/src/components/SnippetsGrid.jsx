@@ -59,14 +59,17 @@ const SnippetsGrid = ({ pinnedSnippets = false }) => {
   };
 
   useEffect(() => {
+    const trimmedQuery = query.trim();
+
+    if (trimmedQuery === "") {
+      getAllSnippets();
+      return;
+    }
+
     const timeout = setTimeout(() => {
-      if (query.trim() !== "") {
-        console.log("Search query:", query);
-        handleSearch(query);
-      } else {
-        getAllSnippets();
-      }
-    }, 500);
+      handleSearch(trimmedQuery);
+    }, 300);
+
     return () => clearTimeout(timeout);
   }, [query, pinnedSnippets]);
 
