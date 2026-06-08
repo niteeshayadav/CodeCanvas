@@ -99,13 +99,29 @@ Built using React.js, Node.js, Express.js, and MongoDB, the application combines
 
 > Explore the key features and user interface of CodeCanvas.
 
-| Dashboard | Create Snippet | Snippet Details |
-|------------|------------|------------|
-| ![Dashboard](./screenshots/dashboard.png) | ![Create Snippet](./screenshots/create-snippet.png) | ![Snippet Details](./screenshots/snippet-details.png) |
+### Authentication
 
-| Search & Filter | Favorites | Profile |
+| Login | Register |
+|--------|----------|
+| ![Login](./screenshots/login.png) | ![Register](./screenshots/register.png) |
+
+### Dashboard & Navigation
+
+| Dashboard | Search Notes | Filter Notes |
 |------------|------------|------------|
-| ![Search](./screenshots/search-filter.png) | ![Favorites](./screenshots/favorites.png) | ![Profile](./screenshots/profile.png) |
+| ![Dashboard](./screenshots/dashboard.png) | ![Search](./screenshots/search.png) | ![Filter](./screenshots/filter.png) |
+
+### Snippet Management
+
+| Create Snippet | Snippet Details | Favorites |
+|------------|------------|------------|
+| ![Create Snippet](./screenshots/create-snippet.png) | ![Snippet Details](./screenshots/snippet-details.png) | ![Favorites](./screenshots/favourites.png) |
+
+### User Profile
+
+| Profile |
+|----------|
+| ![Profile](./screenshots/profile.png) |
 
 ---
 
