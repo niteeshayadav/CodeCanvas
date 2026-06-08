@@ -160,7 +160,7 @@ Built using React.js, Node.js, Express.js, and MongoDB, the application combines
 
 ## 🏗️ Architecture
 
-![Architecture](./screenshots/architecture.png)
+![Architecture](./screenshots/architecture.jpeg)
 
 ## Folder Structure
 
